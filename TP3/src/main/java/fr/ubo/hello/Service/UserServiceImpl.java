@@ -125,7 +125,6 @@ public class UserServiceImpl implements UserService {
                 return null;
             }
 
-            // Vérification du mot de passe (en clair pour l'instant)
             if (user.getPassword().equals(password)) {
                 logger.info("Service : Authentification réussie pour user_id={}", user.getId());
                 return user;

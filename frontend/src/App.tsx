@@ -368,23 +368,19 @@ export default function App() {
     return (
         <div style={{ padding: 20 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <h1>Gestion des utilisateurs</h1>
 
-                {/* BOUTON LOGIN/LOGOUT */}
-                <div>
-                    {currentUser ? (
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                            <span>Connecté en tant que : <strong>{currentUser.name}</strong></span>
-                            <button onClick={handleLogout}>Déconnexion</button>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={() => setShowLogin(true)}
-                            style={{ padding: "8px 16px" }}
-                        >
-                            🔐 Connexion
-                        </button>
-                    )}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                    <h1>Gestion des utilisateurs</h1>
+
+                    {/* BOUTON LOGIN/LOGOUT - Afficher seulement si connecté */}
+                    <div>
+                        {currentUser && (
+                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                <span>Connecté en tant que : <strong>{currentUser.name}</strong></span>
+                                <button onClick={handleLogout}>Déconnexion</button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 

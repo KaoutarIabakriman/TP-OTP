@@ -1,4 +1,3 @@
-// OTP.java
 package fr.ubo.hello.Model;
 
 import java.time.LocalDateTime;
@@ -21,7 +20,6 @@ public class OTP {
         this.isUsed = false;
     }
 
-    // Getters et Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

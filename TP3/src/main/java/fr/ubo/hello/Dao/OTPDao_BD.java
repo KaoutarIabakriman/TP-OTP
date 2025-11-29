@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 
 @Repository("mysqlOTPDao")
 public class OTPDao_BD implements OTPDao {
@@ -66,26 +65,7 @@ public class OTPDao_BD implements OTPDao {
         return null;
     }
 
-    @Override
-    public OTP findByUserIdAndCode(int userId, String otpCode) {
-        String sql = "SELECT * FROM otp_codes WHERE user_id = ? AND otp = ? ORDER BY created_at DESC LIMIT 1";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, userId);
-            stmt.setString(2, otpCode);
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return extractOTP(rs);
-            }
-
-        } catch (SQLException e) {
-            logger.error("DAO OTP : Erreur lors de la recherche de l'OTP", e);
-        }
-        return null;
-    }
 
 
     @Override
@@ -103,30 +83,9 @@ public class OTPDao_BD implements OTPDao {
         }
     }
 
-    @Override
-    public OTP findLatestOTP(int userId) {
-        String sql = "SELECT * FROM otp_codes WHERE user_id = ? ORDER BY created_at DESC LIMIT 1";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, userId);
-            ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                return extractOTP(rs);
-            }
-
-        } catch (SQLException e) {
-            logger.error("DAO OTP : Erreur lors de la recherche du dernier OTP", e);
-        }
-        return null;
-    }
-
-    @Override
-    public void cleanupExpiredOTPs() {
-        deleteExpiredOTPs(); // Appel à la méthode de compatibilité
-    }
 
     @Override
     public boolean deleteExpiredOTPs() {

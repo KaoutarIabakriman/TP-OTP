@@ -5,7 +5,7 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private String phone;  // Ajout du champ téléphone
+    private String phone;
 
     public User() {}
 
@@ -17,7 +17,6 @@ public class User {
         this.phone = null; // Ajouter cette ligne
     }
 
-    // Ajouter ce constructeur complet
     public User(int id, String name, String email, String password, String phone) {
         this.id = id;
         this.name = name;

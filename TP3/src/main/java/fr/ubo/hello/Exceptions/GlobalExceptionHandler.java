@@ -14,14 +14,12 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // User non trouvé
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> handleUserNotFound(UserNotFoundException ex) {
         log.warn("Erreur : {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-    // Erreurs SQL → probable coupure de BDD
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<String> handleSQL(SQLException ex) {
         log.error("Erreur SQL : {}", ex.getMessage());

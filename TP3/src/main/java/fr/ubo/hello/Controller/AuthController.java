@@ -44,7 +44,6 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            // Vérifier les identifiants
             User user = userService.authenticateUser(email, password);
 
             if (user == null) {
@@ -57,10 +56,7 @@ public class AuthController {
             logger.info("Controller : Utilisateur trouvé - id: {}, email: {}, phone: {}",
                     user.getId(), user.getEmail(), user.getPhone());
 
-            // ⚠️ DEBUG TEMPORAIRE - Toujours réussir et forcer le userId
-            boolean otpSent = true; // Force à true pour les tests
 
-            // Générer OTP quand même pour le test
             try {
                 otpService.generateAndSendOTP(user.getId());
                 logger.info("Controller : OTP généré pour user_id={}", user.getId());
@@ -68,7 +64,6 @@ public class AuthController {
                 logger.warn("Controller : Erreur génération OTP (ignorée pour test): {}", e.getMessage());
             }
 
-            // ⚠️ RÉPONSE FIXE POUR DEBUG - TOUJOURS AVEC userId
             response.put("success", true);
             response.put("otpSent", true);
             response.put("requiresOTP", true);
@@ -96,18 +91,16 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // ⚠️ GESTION FLEXIBLE DES PARAMÈTRES
             Integer userId = null;
             String otpCode = null;
 
-            // Essayer différents formats
             if (request.get("userId") != null) {
                 userId = Integer.valueOf(request.get("userId").toString());
             }
             if (request.get("otpCode") != null) {
                 otpCode = (String) request.get("otpCode");
             } else if (request.get("otp") != null) {
-                otpCode = (String) request.get("otp"); // Fallback pour "otp"
+                otpCode = (String) request.get("otp");
             }
 
             logger.info("Controller : Vérification OTP - userId: {}, otpCode: {}", userId, otpCode);
@@ -119,11 +112,10 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            // Vérifier l'OTP
+
             boolean isValid = otpService.verifyOTP(userId, otpCode);
 
             if (isValid) {
-                // Récupérer l'utilisateur
                 User user = userService.getById(userId);
 
                 logger.info("Controller : Connexion réussie avec OTP pour user_id={}", userId);

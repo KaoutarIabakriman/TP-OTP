@@ -1,4 +1,3 @@
-// OTPController.java
 package fr.ubo.hello.Controller;
 
 import fr.ubo.hello.Service.OTPService;

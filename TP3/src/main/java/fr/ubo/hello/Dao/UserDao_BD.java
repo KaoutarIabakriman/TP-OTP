@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository("mysqlDAO")
-@Primary  // ← Ce sera le bean par défaut
+@Primary
 public class UserDao_BD implements UserDao {
 
     private static final Logger logger = LoggerFactory.getLogger(UserDao_BD.class);
@@ -24,7 +24,7 @@ public class UserDao_BD implements UserDao {
 
         String sql = "SELECT * FROM users";
 
-        try (Connection conn = DBConnection.getConnection(); // ← Utiliser DBConnection
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
@@ -47,7 +47,7 @@ public class UserDao_BD implements UserDao {
         logger.debug("DAO : SELECT * FROM users WHERE id={}", id);
         String sql = "SELECT * FROM users WHERE id = ?";
 
-        try (Connection conn = DBConnection.getConnection(); // ← Utiliser DBConnection
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
@@ -75,7 +75,7 @@ public class UserDao_BD implements UserDao {
         logger.debug("DAO : INSERT INTO users(name,email,password,phone) VALUES (?, ?, ?, ?)");
         String sql = "INSERT INTO users(name, email, password, phone) VALUES(?, ?, ?, ?)";
 
-        try (Connection conn = DBConnection.getConnection(); // ← Utiliser DBConnection
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getName());
@@ -104,7 +104,7 @@ public class UserDao_BD implements UserDao {
         logger.debug("DAO : UPDATE users WHERE id={}", user.getId());
         String sql = "UPDATE users SET name=?, email=?, password=?, phone=? WHERE id=?";
 
-        try (Connection conn = DBConnection.getConnection(); // ← Utiliser DBConnection
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getName());
@@ -134,7 +134,7 @@ public class UserDao_BD implements UserDao {
         logger.debug("DAO : DELETE FROM users WHERE id={}", id);
         String sql = "DELETE FROM users WHERE id = ?";
 
-        try (Connection conn = DBConnection.getConnection(); // ← Utiliser DBConnection
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
@@ -160,7 +160,7 @@ public class UserDao_BD implements UserDao {
         logger.debug("DAO : SELECT * FROM users WHERE email={}", email);
         String sql = "SELECT * FROM users WHERE email = ?";
 
-        try (Connection conn = DBConnection.getConnection(); // ← Utiliser DBConnection
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, email);

@@ -24,7 +24,6 @@ public class UserDao_Mock implements UserDao {
 
     @Override
     public User findByEmail(String email) {
-        // retourne un utilisateur mocké, ou null
         return users.stream()
                 .filter(u -> u.getEmail().equalsIgnoreCase(email))
                 .findFirst()
