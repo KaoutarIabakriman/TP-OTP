@@ -2,9 +2,9 @@ Ce projet consiste en la réalisation d'une application web complète, conteneur
 
 ---
 
-## 1. ⚙️ Architecture du Projet
+## 1. Architecture du Projet
 
-L’application est orchestrée via **Docker Compose** et repose sur une **architecture en couches (N-Tiers)** dans le backend Java (Spring Boot), assurant modularité et maintenabilité.
+L’application est orchestrée via **Docker Compose** et repose sur une **architecture en couches (N-Tiers)** dans le backend Java / Spring , assurant modularité et maintenabilité.
 
 ---
 
@@ -29,7 +29,7 @@ Le code Java est strictement structuré en couches, selon le principe de respons
 | **Service** | Logique métier | Règles d’affaires, orchestration | → Appelle DAO ou Utils |
 | **Dao (Repository)** | Accès aux données | CRUD, interaction directe avec la BDD | → BDD |
 | **Model** | Objets métier | Représentation des tables (User, OTP) | → Partout |
-| **Utils** | Outils transversaux | Services externes (ex : SMSService 172.19.28.37) | ← Appelé par Service |
+| **Utils** | Outils transversaux | Services externes (SMSService 172.19.28.37) | ← Appelé par Service |
 
 ---
 
