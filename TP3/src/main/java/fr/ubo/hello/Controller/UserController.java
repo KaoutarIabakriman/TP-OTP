@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller responsible for managing users.
+ */
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*")
@@ -22,6 +25,11 @@ public class UserController {
     @Autowired
     private UserService service;
 
+    /**
+     * Retrieves all users.
+     *
+     * @return ResponseEntity containing the list of users or error status.
+     */
     @GetMapping
     public ResponseEntity<List<User>> getUsers() {
         logger.info("Controller : GET /users - Récupération de tous les utilisateurs");
@@ -37,6 +45,11 @@ public class UserController {
         }
     }
 
+    /**
+     *
+     * @param id ID of the user.
+     * @return ResponseEntity containing the user or 404 if not found.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable int id) {
         logger.info("Controller : GET /users/{} - Récupération utilisateur", id);
@@ -56,6 +69,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Creates a new user.
+     *
+     * @param u User object in the request body.
+     * @return ResponseEntity with creation status.
+     */
     @PostMapping
     public ResponseEntity<String> create(@RequestBody User u) {
         logger.info("Controller : POST /users - Création utilisateur '{}'", u.getName());
@@ -72,6 +91,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Updates an existing user.
+     *
+     * @param id ID of the user to update.
+     * @param u  Updated User object.
+     * @return ResponseEntity with update status.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable int id, @RequestBody User u) {
         logger.info("Controller : PUT /users/{} - Mise à jour utilisateur", id);
@@ -94,6 +120,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Deletes a user by ID.
+     *
+     * @param id ID of the user to delete.
+     * @return ResponseEntity with deletion status.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") int id) {
         logger.info("Controller : DELETE /users/{} - Suppression utilisateur", id);

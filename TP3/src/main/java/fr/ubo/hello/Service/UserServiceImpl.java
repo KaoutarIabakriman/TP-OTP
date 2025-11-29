@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Implementation of UserService interface.
+ * Handles CRUD operations and authentication for users.
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -20,129 +24,85 @@ public class UserServiceImpl implements UserService {
     @Qualifier("mysqlDAO")
     private UserDao dao;
 
-
+    /**
+     * Retrieves all users.
+     *
+     * @return list of users.
+     */
     @Override
     public List<User> findAll() {
         logger.info("Service : findAll()");
-        List<User> users = dao.findAll();
-        logger.info("Service : {} utilisateurs récupérés", users.size());
-        return users;
+        return dao.findAll();
     }
 
+    /**
+     * Retrieves a user by ID.
+     *
+     * @param id user ID.
+     * @return User object.
+     * @throws UserNotFoundException if user not found.
+     */
+    @Override
     public User getById(int id) {
-        logger.info("Service : récupération utilisateur id={}", id);
-
-        try {
-            User u = dao.findById(id);
-
-            if (u == null) {
-                logger.warn("Service : Utilisateur id={} non trouvé", id);
-                throw new UserNotFoundException(id);
-            }
-
-            logger.info("Service : Utilisateur id={} récupéré avec succès", id);
-            return u;
-
-        } catch (UserNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Service : erreur lors de la récupération de l'utilisateur id={}", id, e);
-            throw e;
-        }
+        User u = dao.findById(id);
+        if (u == null) throw new UserNotFoundException(id);
+        return u;
     }
 
+    /**
+     * Creates a new user.
+     *
+     * @param u user to create.
+     */
     @Override
     public void create(User u) {
-        logger.info("Service : création utilisateur '{}'", u.getName());
-
-        try {
-            if (!dao.save(u)) {
-                logger.error("Service : Échec création utilisateur '{}'", u.getName());
-                throw new RuntimeException("Erreur lors de la création de l'utilisateur.");
-            }
-
-            logger.info("Service : Utilisateur '{}' créé avec succès", u.getName());
-
-        } catch (Exception e) {
-            logger.error("Service : erreur lors de la création de l'utilisateur '{}'", u.getName(), e);
-            throw e;
-        }
+        if (!dao.save(u)) throw new RuntimeException("Erreur lors de la création de l'utilisateur.");
     }
 
+    /**
+     * Updates an existing user.
+     *
+     * @param u updated user object.
+     * @throws UserNotFoundException if user does not exist.
+     */
+    @Override
     public void update(User u) {
-        logger.info("Service : mise à jour utilisateur id={}", u.getId());
-
-        try {
-            boolean updated = dao.update(u);
-
-            if (!updated) {
-                logger.warn("Service : Mise à jour impossible - utilisateur id={} non trouvé", u.getId());
-                throw new UserNotFoundException(u.getId());
-            }
-
-            logger.info("Service : Utilisateur id={} mis à jour avec succès", u.getId());
-
-        } catch (UserNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Service : erreur lors de la mise à jour de l'utilisateur id={}", u.getId(), e);
-            throw e;
-        }
+        if (!dao.update(u)) throw new UserNotFoundException(u.getId());
     }
 
+    /**
+     * Deletes a user by ID.
+     *
+     * @param id user ID.
+     * @throws UserNotFoundException if user does not exist.
+     */
+    @Override
     public void delete(int id) {
-        logger.info("Service : suppression utilisateur id={}", id);
-
-        try {
-            boolean deleted = dao.delete(id);
-
-            if (!deleted) {
-                logger.warn("Service : Suppression impossible - utilisateur id={} non trouvé", id);
-                throw new UserNotFoundException(id);
-            }
-
-            logger.info("Service : Utilisateur id={} supprimé avec succès", id);
-
-        } catch (UserNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Service : erreur lors de la suppression de l'utilisateur id={}", id, e);
-            throw e;
-        }
+        if (!dao.delete(id)) throw new UserNotFoundException(id);
     }
 
-
-
+    /**
+     * Authenticates a user by email and password.
+     *
+     * @param email    user email.
+     * @param password user password.
+     * @return User object if credentials valid, null otherwise.
+     */
     @Override
     public User authenticateUser(String email, String password) {
-        logger.info("Service : authentification pour email={}", email);
-
-        try {
-            User user = dao.findByEmail(email);
-
-            if (user == null) {
-                logger.warn("Service : Aucun utilisateur trouvé avec l'email={}", email);
-                return null;
-            }
-
-            if (user.getPassword().equals(password)) {
-                logger.info("Service : Authentification réussie pour user_id={}", user.getId());
-                return user;
-            } else {
-                logger.warn("Service : Mot de passe incorrect pour email={}", email);
-                return null;
-            }
-
-        } catch (Exception e) {
-            logger.error("Service : erreur lors de l'authentification", e);
-            throw e;
-        }
+        User user = dao.findByEmail(email);
+        if (user != null && user.getPassword().equals(password)) return user;
+        return null;
     }
 
+    /**
+     * Finds a user by email.
+     *
+     * @param email email of the user.
+     * @return User object or null if not found.
+     */
     @Override
     public User findByEmail(String email) {
-        logger.info("Service : recherche utilisateur par email={}", email);
         return dao.findByEmail(email);
     }
-
 }

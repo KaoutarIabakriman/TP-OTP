@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controller responsible for authentication operations.
+ */
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
@@ -26,13 +29,18 @@ public class AuthController {
     @Autowired
     private OTPService otpService;
 
+    /**
+     * Authenticates a user with email and password, generates OTP if successful.
+     *
+     * @param credentials Map containing "email" and "password".
+     * @return ResponseEntity containing success status, OTP information, and user details.
+     */
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credentials) {
         logger.info("Controller : POST /api/auth/login - Tentative de connexion pour {}",
                 credentials.get("email"));
 
         Map<String, Object> response = new HashMap<>();
-
         try {
             String email = credentials.get("email");
             String password = credentials.get("password");
@@ -53,10 +61,6 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
 
-            logger.info("Controller : Utilisateur trouvé - id: {}, email: {}, phone: {}",
-                    user.getId(), user.getEmail(), user.getPhone());
-
-
             try {
                 otpService.generateAndSendOTP(user.getId());
                 logger.info("Controller : OTP généré pour user_id={}", user.getId());
@@ -68,7 +72,7 @@ public class AuthController {
             response.put("otpSent", true);
             response.put("requiresOTP", true);
             response.put("message", "Code OTP envoyé par SMS. Veuillez le saisir.");
-            response.put("userId", user.getId()); // ← FORCER le userId
+            response.put("userId", user.getId());
             response.put("email", email);
 
             logger.info("Controller : Réponse envoyée - userId: {}", user.getId());
@@ -83,11 +87,15 @@ public class AuthController {
         }
     }
 
+    /**
+     * Verifies a user's OTP code.
+     *
+     * @param request Map containing "userId" and "otpCode".
+     * @return ResponseEntity with authentication status and user info if successful.
+     */
     @PostMapping("/verify-otp")
     public ResponseEntity<Map<String, Object>> verifyOTP(@RequestBody Map<String, Object> request) {
         logger.info("Controller : POST /api/auth/verify-otp - Vérification OTP");
-        logger.info("Controller : Requête reçue: {}", request);
-
         Map<String, Object> response = new HashMap<>();
 
         try {
@@ -103,8 +111,6 @@ public class AuthController {
                 otpCode = (String) request.get("otp");
             }
 
-            logger.info("Controller : Vérification OTP - userId: {}, otpCode: {}", userId, otpCode);
-
             if (userId == null || otpCode == null || otpCode.isEmpty()) {
                 logger.warn("Controller : Paramètres manquants pour la vérification OTP");
                 response.put("success", false);
@@ -112,13 +118,10 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-
             boolean isValid = otpService.verifyOTP(userId, otpCode);
 
             if (isValid) {
                 User user = userService.getById(userId);
-
-                logger.info("Controller : Connexion réussie avec OTP pour user_id={}", userId);
                 response.put("success", true);
                 response.put("authenticated", true);
                 response.put("message", "Authentification réussie");
@@ -129,7 +132,6 @@ public class AuthController {
                 ));
                 return ResponseEntity.ok(response);
             } else {
-                logger.warn("Controller : OTP invalide pour user_id={}", userId);
                 response.put("success", false);
                 response.put("authenticated", false);
                 response.put("message", "Code OTP invalide ou expiré");
@@ -144,6 +146,11 @@ public class AuthController {
         }
     }
 
+    /**
+     * Cleans up expired OTP entries from the system.
+     *
+     * @return ResponseEntity indicating success or failure.
+     */
     @PostMapping("/cleanup-otp")
     public ResponseEntity<String> cleanupOTP() {
         try {

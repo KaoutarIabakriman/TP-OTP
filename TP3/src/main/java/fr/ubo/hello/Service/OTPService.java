@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
+/**
+ * Service responsible for OTP (One-Time Password) operations.
+ * Handles OTP generation, validation, sending via SMS, and cleanup of expired OTPs.
+ */
 @Service
 public class OTPService {
 
@@ -30,7 +34,12 @@ public class OTPService {
 
     private final SecureRandom random = new SecureRandom();
 
-
+    /**
+     * Cleans and formats a phone number for SMS sending.
+     *
+     * @param phoneNumber raw phone number.
+     * @return cleaned phone number in standard French format, or null if invalid.
+     */
     private String cleanPhoneNumber(String phoneNumber) {
         if (phoneNumber == null) return null;
 
@@ -49,7 +58,11 @@ public class OTPService {
         return null;
     }
 
-
+    /**
+     * Generates a random numeric OTP code.
+     *
+     * @return OTP as a string.
+     */
     private String generateOTPCode() {
         StringBuilder otp = new StringBuilder();
         for (int i = 0; i < OTP_LENGTH; i++) {
@@ -60,7 +73,13 @@ public class OTPService {
         return generatedOTP;
     }
 
-
+    /**
+     * Sends an OTP via SMS.
+     *
+     * @param phoneNumber destination phone number.
+     * @param otpCode     OTP code to send.
+     * @return true if SMS successfully sent, false otherwise.
+     */
     private boolean sendSMS(String phoneNumber, String otpCode) {
         try {
             String cleanPhone = cleanPhoneNumber(phoneNumber);
@@ -70,17 +89,8 @@ public class OTPService {
                 return false;
             }
 
-            logger.info("Service : Envoi SMS via API vers: {}", cleanPhone);
-
             boolean smsSent = smsService.sendOTP(cleanPhone, otpCode);
-
-            if (smsSent) {
-                logger.info("Service : SMS envoyé avec succès via API");
-                return true;
-            } else {
-                logger.error("Service : Échec envoi SMS via API");
-                return false;
-            }
+            return smsSent;
 
         } catch (Exception e) {
             logger.error("Service : Exception lors de l'envoi SMS via API: {}", e.getMessage(), e);
@@ -88,101 +98,57 @@ public class OTPService {
         }
     }
 
-
-    public boolean requestOTP(int userId) {
+    /**
+     * Requests an OTP for a user (alias for generateAndSendOTP).
+     *
+     * @param userId user ID.
+     * @return true if OTP generated successfully.
+     */
+    public boolean requestOTP(int userId) throws InterruptedException {
         return generateAndSendOTP(userId);
     }
 
-    public boolean generateAndSendOTP(int userId) {
+    /**
+     * Generates a new OTP, saves it in DB, and sends it via SMS.
+     *
+     * @param userId user ID.
+     * @return true if OTP successfully generated and sent (or in dev mode, just generated).
+     */
+    public boolean generateAndSendOTP(int userId) throws InterruptedException {
         logger.info("Service : Début génération OTP pour user_id={}", userId);
 
         try {
-            if (otpDao == null || userService == null || smsService == null) {
-                logger.error("Service : Dépendances manquantes");
-                throw new RuntimeException("Service OTP non configuré correctement");
-            }
-
             int recentOTPCount = otpDao.countRecentOTPsByUserId(userId, 30);
             if (recentOTPCount >= MAX_OTP_PER_30_MIN) {
-                logger.warn("Service : Trop de demandes d'OTP pour user_id={}. Limite atteinte.", userId);
                 throw new RuntimeException("Trop de demandes d'OTP. Veuillez patienter 30 minutes.");
             }
 
             User user = userService.getById(userId);
             if (user.getPhone() == null || user.getPhone().isEmpty()) {
-                logger.error("Service : Aucun numéro de téléphone pour user_id={}", userId);
                 throw new RuntimeException("Aucun numéro de téléphone associé à ce compte.");
             }
-
-            logger.info("Service : Utilisateur trouvé - id: {}, phone: {}", userId, user.getPhone());
 
             String otpCode = generateOTPCode();
             LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(OTP_EXPIRY_MINUTES);
 
-            System.out.println(" ");
-            System.out.println("================================================");
-            System.out.println("OTP GÉNÉRÉ POUR LES TESTS  🎯 🎯 🎯");
-            System.out.println("CODE OTP: " + otpCode);
-            System.out.println("USER ID: " + userId);
-            System.out.println("EMAIL: " + user.getEmail());
-            System.out.println("NUMÉRO: " + user.getPhone());
-            System.out.println("EXPIRE À: " + expiresAt);
-            System.out.println("UTILISEZ CE CODE DANS VOTRE INTERFACE");
-            System.out.println("================================================");
-            System.out.println(" ");
-
-            logger.warn("🎯 OTP DEBUG - Code: {} pour user_id: {}, phone: {}, email: {}",
-                    otpCode, userId, user.getPhone(), user.getEmail());
-
             OTP otp = new OTP(userId, otpCode, expiresAt);
 
             if (!otpDao.save(otp)) {
-                logger.error("Service : Échec de la sauvegarde de l'OTP pour user_id={}", userId);
                 throw new RuntimeException("Erreur lors de la génération de l'OTP.");
             }
 
-            logger.info("Service : OTP sauvegardé en base de données");
-
             boolean smsSent = false;
             int maxRetries = 2;
-
-            logger.info("Service : Tentative d'envoi SMS DIRECT");
-
             for (int attempt = 1; attempt <= maxRetries; attempt++) {
-                logger.info("Service : Tentative d'envoi SMS {} pour user_id={}", attempt, userId);
                 smsSent = sendSMS(user.getPhone(), otpCode);
-
-                if (smsSent) {
-                    logger.info("Service : SMS envoyé avec succès au {}", user.getPhone());
-                    break;
-                }
-
-                if (attempt < maxRetries) {
-                    logger.warn("Service : Échec tentative {}, nouvelle tentative dans 3 secondes", attempt);
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        break;
-                    }
-                }
+                if (smsSent) break;
+                if (attempt < maxRetries) Thread.sleep(3000);
             }
 
             if (!smsSent) {
-                System.out.println(" ");
-                System.out.println("ÉCHEC ENVOI SMS - MODE DÉVELOPPEMENT");
-                System.out.println("Le SMS n'a pas pu être envoyé au: " + user.getPhone());
-                System.out.println("Mais l'OTP a été généré: " + otpCode);
-                System.out.println("Utilisez le code ci-dessus pour vous connecter");
-                System.out.println(" ");
-
                 logger.warn("MODE DÉVELOPPEMENT - Échec envoi SMS. OTP généré: {} pour user_id={}", otpCode, userId);
-                logger.warn("Numéro: {} - Utilisez le code OTP ci-dessus", user.getPhone());
-
-                return true;
             }
 
-            logger.info("Service : OTP généré et envoyé avec succès pour user_id={}", userId);
             return true;
 
         } catch (Exception e) {
@@ -191,64 +157,60 @@ public class OTPService {
         }
     }
 
-
+    /**
+     * Checks if SMS server is available.
+     *
+     * @return true if available.
+     */
     public boolean isSMSServerAvailable() {
         return smsService.isSMSServerAvailable();
     }
 
-
+    /**
+     * Verifies the OTP code for a user.
+     *
+     * @param userId  user ID.
+     * @param otpCode OTP code.
+     * @return true if OTP valid.
+     */
     public boolean verifyOTP(int userId, String otpCode) {
-        logger.info("Service : Vérification de l'OTP pour user_id={}, code={}", userId, otpCode);
-
         try {
-            if (otpDao == null) {
-                logger.error("Service : OTPDao non disponible");
-                return false;
-            }
-
             OTP otp = otpDao.findValidOTP(userId, otpCode);
-
             if (otp != null) {
-
                 otpDao.markAsUsed(otp.getId());
-                logger.info("Service : OTP vérifié avec succès pour user_id={}", userId);
                 return true;
             } else {
-                logger.warn("Service : OTP invalide pour user_id={}", userId);
                 return false;
             }
-
         } catch (Exception e) {
             logger.error("Service : Erreur lors de la vérification de l'OTP pour user_id={}", userId, e);
             return false;
         }
     }
 
-
+    /**
+     * Deletes expired OTPs from the database.
+     */
     public void cleanupExpiredOTPs() {
         if (otpDao != null) {
-            logger.info("Service : Nettoyage des OTP expirés");
             boolean deletedCount = otpDao.deleteExpiredOTPs();
             logger.info("Service : {} OTP expirés supprimés", deletedCount);
         }
     }
 
-
+    /**
+     * Checks if a user can request a new OTP based on rate limiting.
+     *
+     * @param userId user ID.
+     * @return true if user can request OTP.
+     */
     public boolean canRequestOTP(int userId) {
         try {
             int recentOTPCount = otpDao.countRecentOTPsByUserId(userId, 30);
-            boolean canRequest = recentOTPCount < MAX_OTP_PER_30_MIN;
-            logger.info("Service : Vérification éligibilité OTP user_id={}: {} demandes récentes, peut demander: {}",
-                    userId, recentOTPCount, canRequest);
-            return canRequest;
+            return recentOTPCount < MAX_OTP_PER_30_MIN;
         } catch (Exception e) {
             logger.error("Service : Erreur lors de la vérification de l'éligibilité OTP", e);
             return false;
         }
     }
-
-
-
-
-
 }

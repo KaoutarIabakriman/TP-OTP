@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controller responsible for OTP management.
+ * Provides endpoints for requesting and verifying OTP codes.
+ */
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "*")
@@ -21,6 +25,12 @@ public class OTPController {
     @Autowired
     private OTPService otpService;
 
+    /**
+     * Requests an OTP for a given user.
+     *
+     * @param request Map containing "email" (as a string representing user ID).
+     * @return ResponseEntity containing success/error message.
+     */
     @PostMapping("/request-otp")
     public ResponseEntity<Map<String, String>> requestOTP(@RequestBody Map<String, String> request) {
         String email = request.get("email");
@@ -49,6 +59,11 @@ public class OTPController {
         }
     }
 
+    /**
+     *
+     * @param request Map containing "email" (user ID) and "otpCode".
+     * @return ResponseEntity indicating authentication success or failure.
+     */
     @PostMapping("/verify-otp")
     public ResponseEntity<Map<String, String>> verifyOTP(@RequestBody Map<String, String> request) {
         String email = request.get("email");
@@ -79,6 +94,11 @@ public class OTPController {
         }
     }
 
+    /**
+     *
+     * @param message Success message.
+     * @return Map with keys "status" and "message".
+     */
     private Map<String, String> createSuccessResponse(String message) {
         Map<String, String> response = new HashMap<>();
         response.put("status", "success");
@@ -86,6 +106,11 @@ public class OTPController {
         return response;
     }
 
+    /**
+     *
+     * @param message Error message.
+     * @return Map with keys "status" and "message".
+     */
     private Map<String, String> createErrorResponse(String message) {
         Map<String, String> response = new HashMap<>();
         response.put("status", "error");
