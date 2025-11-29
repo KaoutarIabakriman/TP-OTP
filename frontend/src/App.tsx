@@ -370,7 +370,6 @@ export default function App() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                    <h1>Gestion des utilisateurs</h1>
 
                     {/* BOUTON LOGIN/LOGOUT - Afficher seulement si connecté */}
                     <div>
