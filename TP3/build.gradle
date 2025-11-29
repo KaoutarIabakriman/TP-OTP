@@ -1,0 +1,89 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group = 'fr.ubo.hello'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-parameters']
+}
+
+dependencies {
+    // Tomcat fournit le Servlet API
+    providedCompile 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+
+    // Spring Framework (sans Spring Boot)
+    implementation 'org.springframework:spring-core:6.1.3'
+    implementation 'org.springframework:spring-context:6.1.3'
+    implementation 'org.springframework:spring-web:6.1.3'
+    implementation 'org.springframework:spring-webmvc:6.1.3'
+
+    // Logging
+    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0' // Bridge SLF4J vers Log4j2
+
+    // JSON
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+
+    // Mockito pour les mocks
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+
+    // Spring Test (optionnel mais utile)
+    testImplementation 'org.springframework:spring-test:6.1.3'
+
+    // AssertJ (pour des assertions plus fluides - optionnel)
+    testImplementation 'org.assertj:assertj-core:3.25.3'
+    // MySQL JDBC
+    implementation 'mysql:mysql-connector-java:8.0.33'
+}
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = false
+    }
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+
+    afterSuite { desc, result ->
+        if (!desc.parent) {
+            println "\n==================================="
+            println "Test Summary:"
+            println "  Tests: ${result.testCount}"
+            println "  Passed: ${result.successfulTestCount}"
+            println "  Failed: ${result.failedTestCount}"
+            println "  Skipped: ${result.skippedTestCount}"
+            println "==================================="
+        }
+    }
+}
+war {
+    webAppDirName = 'src/main/webapp'
+}
