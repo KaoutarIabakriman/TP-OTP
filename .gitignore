@@ -1,25 +1,14 @@
 .gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
+dist/
+node_modules/
+.vite/
 
 .idea/
+.vscode/
 *.iml
-*.iws
-*.ipr
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 
-
-
-# NetBeans
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
+.env*
+!.env.example
 
