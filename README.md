@@ -12,35 +12,6 @@ L'application est orchestrée via **Docker Compose** et repose sur une
 **architecture en couches (N-Tiers)** dans le backend Java / Spring, assurant modularité, maintenabilité et séparation claire des
 responsabilités.
 
-------------------------------------------------------------------------
-
-### 1.1. Services Conteneurisés
-
-  ------------------------------------------------------------------------
-  Service        Technologie / Rôle                   Rôle principal
-  -------------- ------------------------------------ --------------------
-  frontend       React / Node.js                      Interface
-                                                      utilisateur (Web
-                                                      App)
-
-  backend        Java (Spring Boot)                   Logique métier, API
-                                                      REST, gestion BDD &
-                                                      OTP
-
-  database       BDD (Schéma DOSI)                    Stockage persistant
-                                                      (User & OTP)
-
-  nginx          Serveur Web (Proxy)                  Sert le frontend et
-                                                      route les appels API
-  ------------------------------------------------------------------------
-
-------------------------------------------------------------------------
-
-
-### 1.2. Architecture Interne du Backend : Modèle N-Tiers (Explication détaillée)
-
-Le backend suit une architecture N-Tiers stricte, garantissant
-**séparation des responsabilités, testabilité et robustesse**.\
 Voici le fonctionnement de chaque couche :
 
 ------------------------------------------------------------------------
