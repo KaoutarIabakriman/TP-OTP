@@ -16,8 +16,6 @@ responsabilités.
 
 ### 1.1. Services Conteneurisés
 
-### 1.1. Services Conteneurisés
-
   ------------------------------------------------------------------------
   Service        Technologie / Rôle                   Rôle principal
   -------------- ------------------------------------ --------------------
