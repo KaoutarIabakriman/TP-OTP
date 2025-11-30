@@ -104,7 +104,7 @@ cd TP-OTP/TP3
 Créer ou compléter un fichier **.env** :
 
     DB_HOST=database
-    DB_PORT=5432
+    DB_PORT=3306
     BACKEND_PORT=8080
     NGINX_PORT=80
 
