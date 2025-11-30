@@ -16,6 +16,8 @@ responsabilités.
 
 ### 1.1. Services Conteneurisés
 
+### 1.1. Services Conteneurisés
+
   ------------------------------------------------------------------------
   Service        Technologie / Rôle                   Rôle principal
   -------------- ------------------------------------ --------------------
@@ -23,11 +25,11 @@ responsabilités.
                                                       utilisateur (Web
                                                       App)
 
-  backend        Java / Spring                        Logique métier, API
+  backend        Java (Spring Boot)                   Logique métier, API
                                                       REST, gestion BDD &
                                                       OTP
 
-  database       BDD                                  Stockage persistant
+  database       BDD (Schéma DOSI)                    Stockage persistant
                                                       (User & OTP)
 
   nginx          Serveur Web (Proxy)                  Sert le frontend et
@@ -35,6 +37,7 @@ responsabilités.
   ------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
+
 
 ### 1.2. Architecture Interne du Backend : Modèle N-Tiers (Explication détaillée)
 
