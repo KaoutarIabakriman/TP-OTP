@@ -1,51 +1,150 @@
-Ce projet consiste en la réalisation d'une application web complète, conteneurisée via Docker, gérant le **CRUD d'utilisateurs** et intégrant un **mécanisme d’authentification OTP (One-Time Password)** envoyé par SMS.
+# 🚀 TP UFR Sciences et Techniques - 2025
 
----
+## Application Full-Stack Sécurisée (CRUD & OTP)
+
+Ce projet consiste en la réalisation d'une application web complète,
+conteneurisée via Docker, gérant le **CRUD d'utilisateurs** et intégrant
+un **mécanisme d'authentification OTP (One-Time Password)** envoyé par
+SMS.
+
+------------------------------------------------------------------------
 
 ## 1. Architecture du Projet
 
-L’application est orchestrée via **Docker Compose** et repose sur une **architecture en couches (N-Tiers)** dans le backend Java / Spring , assurant modularité et maintenabilité.
+L'application est orchestrée via **Docker Compose** et repose sur une
+**architecture en couches (N-Tiers)** dans le backend Java / Spring, assurant modularité, maintenabilité et séparation claire des
+responsabilités.
 
----
+------------------------------------------------------------------------
 
 ### 1.1. Services Conteneurisés
 
-| Service   | Technologie / Rôle        | Rôle principal |
-|-----------|----------------------------|----------------|
-| frontend  | React / Node.js           | Interface utilisateur (Web App) |
-| backend   | Java (Spring Boot)        | Logique métier, API REST, gestion BDD & OTP |
-| database  | BDD (Schéma DOSI)         | Stockage persistant (User & OTP) |
-| nginx     | Serveur Web (Proxy)       | Sert le frontend et route les appels API |
+  ------------------------------------------------------------------------
+  Service        Technologie / Rôle                   Rôle principal
+  -------------- ------------------------------------ --------------------
+  frontend       React / Node.js                      Interface
+                                                      utilisateur (Web
+                                                      App)
 
----
+  backend        Java / Spring                        Logique métier, API
+                                                      REST, gestion BDD &
+                                                      OTP
 
-### 1.2. Architecture Interne du Backend : Modèle N-Tiers
+  database       BDD                                  Stockage persistant
+                                                      (User & OTP)
 
-Le code Java est strictement structuré en couches, selon le principe de responsabilité unique (SRP).
+  nginx          Serveur Web (Proxy)                  Sert le frontend et
+                                                      route les appels API
+  ------------------------------------------------------------------------
 
-| Couche     | Rôle | Responsabilités principales | Communication |
-|------------|------|-----------------------------|---------------|
-| **Controller** | Point d’entrée API | Gestion des requêtes HTTP, validation | → Appelle Service |
-| **Service** | Logique métier | Règles d’affaires, orchestration | → Appelle DAO ou Utils |
-| **Dao (Repository)** | Accès aux données | CRUD, interaction directe avec la BDD | → BDD |
-| **Model** | Objets métier | Représentation des tables (User, OTP) | → Partout |
-| **Utils** | Outils transversaux | Services externes (SMSService 172.19.28.37) | ← Appelé par Service |
+------------------------------------------------------------------------
 
----
+### 1.2. Architecture Interne du Backend : Modèle N-Tiers (Explication détaillée)
 
-## 2. 🚀 Prérequis & Lancement
+Le backend suit une architecture N-Tiers stricte, garantissant
+**séparation des responsabilités, testabilité et robustesse**.\
+Voici le fonctionnement de chaque couche :
+
+------------------------------------------------------------------------
+
+## Controller (API Layer)
+
+### Rôle
+
+Point d'entrée du backend : reçoit et traite les requêtes HTTP.
+
+### Responsabilités
+
+-   Validation du format des données\
+-   Conversion JSON ↔ Java\
+-   Appelle la couche **Service**\
+-   Retourne une réponse HTTP
+
+### Ne contient jamais
+
+-   de logique métier\
+-   d'accès direct à la BDD
+
+------------------------------------------------------------------------
+
+## Service (Business Layer)
+
+### Rôle
+
+Cœur de l'application : gère **toute la logique métier**.
+
+### Responsabilités
+
+-   Règles (OTP expiré, délai, validité)\
+-   Orchestration des opérations (BDD + SMS)\
+-   Gestion des exceptions métier\
+-   Interaction avec :
+    -   **DAO** (accès BDD)\
+
+------------------------------------------------------------------------
+
+## DAO / Repository (Data Access Layer)
+
+### Rôle
+
+Accès direct à la base.
+
+### Responsabilités
+
+-   Opérations CRUD\
+-   Requêtes personnalisées
+
+### Ne contient jamais
+
+-   de logique métier
+
+------------------------------------------------------------------------
+
+## Model (Entities / Data Model)
+
+### Rôle
+
+Représentation des tables BDD sous forme de classes Java.
+
+------------------------------------------------------------------------
+
+
+
+# 2. Prérequis & Lancement
 
 ### 2.1. Prérequis
 
-- Docker & Docker Compose  
-- Git  
+-   Docker & Docker Compose\
+-   Git
 
----
+------------------------------------------------------------------------
 
-### 2.2. Configuration et Démarrage
+## 2.2. Configuration et Démarrage
 
-#### 📥 Clonage du dépôt
+### 1. Cloner le dépôt
 
-```bash
+``` bash
 git clone https://github.com/KaoutarIabakriman/TP-OTP.git
 cd TP-OTP/TP3
+```
+
+------------------------------------------------------------------------
+
+### ⚙️ 2. Configurer les variables d'environnement
+
+Créer ou compléter un fichier **.env** :
+
+    DB_HOST=database
+    DB_PORT=5432
+    BACKEND_PORT=8080
+    NGINX_PORT=80
+
+------------------------------------------------------------------------
+
+### 3. Lancer l'application
+
+``` bash
+docker compose up --build 
+```
+
+------------------------------------------------------------------------
