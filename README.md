@@ -130,7 +130,7 @@ cd TP-OTP/TP3
 
 ------------------------------------------------------------------------
 
-### ⚙️ 2. Configurer les variables d'environnement
+### 2. Configurer les variables d'environnement
 
 Créer ou compléter un fichier **.env** :
 
