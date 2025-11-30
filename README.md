@@ -1,7 +1,4 @@
-# 🚀 TP UFR Sciences et Techniques - 2025
-
-## Application Full-Stack Sécurisée (CRUD & OTP)
-
+# TP OTP
 Ce projet consiste en la réalisation d'une application web complète,
 conteneurisée via Docker, gérant le **CRUD d'utilisateurs** et intégrant
 un **mécanisme d'authentification OTP (One-Time Password)** envoyé par
